@@ -7,6 +7,7 @@ public class AStarPathFinding : MonoBehaviour
 
     Grid grid;
     public Transform startPosition, endPosition;
+    public HashSet<Node> visitedNodes = new HashSet<Node>();
 
 
     private void Awake() {
@@ -16,11 +17,11 @@ public class AStarPathFinding : MonoBehaviour
 
     private void Update() {
         if (grid.grid != null) {
-            FindShortestPath(startPosition.position, endPosition.position);
+            visitedNodes = FindShortestPath(startPosition.position, endPosition.position);
         }
     }
 
-    void FindShortestPath(Vector3 startPos, Vector3 endPos) {
+    HashSet<Node> FindShortestPath(Vector3 startPos, Vector3 endPos) {
         Node startNode = grid.GetNodeFromWorldPoint(startPos);
         Node targetNode = grid.GetNodeFromWorldPoint(endPos);
         List<Node> openList = new List<Node>();
@@ -47,11 +48,11 @@ public class AStarPathFinding : MonoBehaviour
             //           return
             if (currentNode == targetNode) {
                 RetracePath(startNode, targetNode);
-                return;
+                return closedList;
             }
 
             //Step5:  foreach neighbour of the current node
-            foreach (Node neighbor in grid.GetNeighboringNodes(currentNode)) {
+            foreach (Node neighbor in grid.GetNeighboringNodes(currentNode, Grid.Direction.FOUR)) {
                 //if neighbour is not traversable or neighbour is in CLOSED
                 //       skip to the next neighbour
                 if (!neighbor.isWalkable || closedList.Contains(neighbor))
@@ -79,6 +80,7 @@ public class AStarPathFinding : MonoBehaviour
             }
 
         }
+        return closedList;
     }
 
     void RetracePath(Node first, Node last) {
@@ -91,9 +93,11 @@ public class AStarPathFinding : MonoBehaviour
         }
 
         path.Reverse();
+        Debug.Log(path);
 
 
         grid.finalPath = path;
+        grid.visitedNodes = this.visitedNodes;
     }
 
 
