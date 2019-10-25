@@ -171,7 +171,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9c11fc0c8ec81254a8a30e853b66bff5, type: 2}
+  - {fileID: 2100000, guid: fe6e525f65ddc2342b27b223711cfdf0, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -520,7 +520,6 @@ GameObject:
   - component: {fileID: 1822146777}
   - component: {fileID: 1822146781}
   - component: {fileID: 1822146783}
-  - component: {fileID: 1822146782}
   m_Layer: 0
   m_Name: MainGrid
   m_TagString: Untagged
@@ -614,27 +613,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eddecf5b4fd1a6246b45198160cc0315, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalGridSize: {x: 20, y: 20}
+  totalGridSize: {x: 30, y: 30}
   unwalkableMask:
     serializedVersion: 2
     m_Bits: 512
   player: {fileID: 1539455512}
   target: {fileID: 73446235}
   nodeRadius: 1
---- !u!114 &1822146782
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1822146776}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d3e186477a832f49825c4e006ecb61d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  startPosition: {fileID: 1539455512}
-  endPosition: {fileID: 73446235}
 --- !u!114 &1822146783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -644,8 +629,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1822146776}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b7c21ef3b5daf74caccb2f57662568a, type: 3}
+  m_Script: {fileID: 11500000, guid: c09e51f5ceb89884da39fdb1a572f222, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  grid: {fileID: 0}
   startPosition: {fileID: 1539455512}
   endPosition: {fileID: 73446235}

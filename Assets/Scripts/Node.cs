@@ -9,6 +9,8 @@ public class Node
 
     //Actual cost and the heuristic cost
     public int gCost, hCost;
+    //Cost for dijkstra
+    public int cost = int.MaxValue;
     public Node parent;
 
     //3d cube for the node

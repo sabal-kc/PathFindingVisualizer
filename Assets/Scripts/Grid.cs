@@ -34,7 +34,7 @@ public class Grid : MonoBehaviour
     }
 
     private void Update() {
-        if (grid != null && finalPath != null) {
+        if (grid != null) {
             Node playerNode = GetNodeFromWorldPoint(player.position);
             Node targetNode = GetNodeFromWorldPoint(target.position);
             foreach (Node n in grid) {
@@ -42,15 +42,18 @@ public class Grid : MonoBehaviour
                 var cubeRenderer = cube.GetComponent<MeshRenderer>();
                 cubeRenderer.material.SetColor("_Color", (n.isWalkable) ? Color.white : Color.red);
 
-                if (visitedNodes.Contains(n)) {
+                if (finalPath!=null && visitedNodes.Contains(n)) {
                     cubeRenderer.material.SetColor("_Color", Color.grey);
                 }
-                if (finalPath.Contains(n)) {
+                if (finalPath!= null && finalPath.Contains(n)) {
                     cubeRenderer.material.SetColor("_Color", Color.yellow);
                 }
                 if (playerNode == n || targetNode == n) {
                     cubeRenderer.material.SetColor("_Color", Color.cyan);
                 }
+                //if (GetComponent<StepManager>().closedList.Contains(n)) {
+                //    cubeRenderer.material.SetColor("_Color", Color.yellow);
+                //}
 
 
             }
