@@ -8,11 +8,18 @@ public class AlgorithmManager : Singleton<AlgorithmManager>
     public Grid grid;
     public Transform startPosition, endPosition;
     public HashSet<Node> visitedNodes = new HashSet<Node>();
+
+    public Dictionary<int, List<Node>> stepNeighbor;
+    public Dictionary<int, Node> stepVisited;
+
+    public bool stepWiseMode = true;
+
     AStar astar;
     BreadthFirst breadthFirst;
     DepthFirst depthFirst;
     Dijkstra dijkstra;
     GreedyBestFirst greedyBfs;
+    Algorithm currentAlgo;
     public enum AlgoType { ASTAR, BFS, DFS, DIJKSTRA, GREEDY };
     public AlgoType algo;
     private void Start() {
@@ -28,25 +35,29 @@ public class AlgorithmManager : Singleton<AlgorithmManager>
 
     // Update is called once per frame
     void Update() {
-        if (grid.grid != null) {
+        if (grid.grid != null && stepWiseMode) {
             switch (algo) {
                 case AlgoType.ASTAR:
-                    visitedNodes = astar.FindShortestPath(startPosition.position, endPosition.position);
+                    currentAlgo = astar;
                     break;
                 case AlgoType.BFS:
-                    visitedNodes = breadthFirst.FindShortestPath(startPosition.position, endPosition.position);
+                    currentAlgo = breadthFirst;
                     break;
                 case AlgoType.DFS:
-                    visitedNodes = depthFirst.FindShortestPath(startPosition.position, endPosition.position);
+                    currentAlgo = depthFirst;
                     break;
                 case AlgoType.DIJKSTRA:
-                    visitedNodes = dijkstra.FindShortestPath(startPosition.position, endPosition.position);
+                    currentAlgo = dijkstra;
                     break;
                 case AlgoType.GREEDY:
-                    visitedNodes = greedyBfs.FindShortestPath(startPosition.position, endPosition.position);
+                    currentAlgo = greedyBfs;
                     break;
             }
+            visitedNodes = currentAlgo.FindShortestPath(startPosition.position, endPosition.position);
+            stepNeighbor = currentAlgo.stepNeighbors;
+            stepVisited = currentAlgo.stepVisited;
 
+        } else if (grid.grid != null && stepWiseMode) {
 
         }
     }
@@ -61,7 +72,6 @@ public class AlgorithmManager : Singleton<AlgorithmManager>
         }
 
         path.Reverse();
-        Debug.Log(path);
 
 
         grid.finalPath = path;

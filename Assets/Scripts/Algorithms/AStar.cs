@@ -2,28 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AStar
+public class AStar: Algorithm
 {
 
-    Grid grid = AlgorithmManager.Instance.grid;
 
 
-    public HashSet<Node> FindShortestPath(Vector3 startPos, Vector3 endPos) {
+    public override HashSet<Node> FindShortestPath(Vector3 startPos, Vector3 endPos) {
         Node startNode = grid.GetNodeFromWorldPoint(startPos);
         Node targetNode = grid.GetNodeFromWorldPoint(endPos);
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
         openList.Add(startNode);
 
+        int counter = 0;
+        stepVisited = new Dictionary<int, Node>();
+        stepNeighbors = new Dictionary<int, List<Node>>();
+
+
         while (openList.Count > 0) {
+
             //Step1: Find the lowest fcost in the open list
             //current = node in OPEN with the lowest f_cost
             Node currentNode = openList[0];
+            
             for (int i = 1; i < openList.Count; i++) {
                 if (openList[i].fCost < currentNode.fCost || (openList[i].fCost < currentNode.fCost && openList[i].hCost < currentNode.hCost)) {
                     currentNode = openList[i];
                 }
             }
+
+            stepVisited.Add(counter, currentNode);
+
 
             //Step2: Remove currentNode from openlist
             openList.Remove(currentNode);
@@ -37,6 +46,8 @@ public class AStar
                 return closedList;
             }
 
+
+            List<Node> stepIndices = new List<Node>();
             //Step5:  foreach neighbour of the current node
             foreach (Node neighbor in grid.GetNeighboringNodes(currentNode, Grid.Direction.FOUR)) {
                 //if neighbour is not traversable or 
@@ -60,10 +71,13 @@ public class AStar
 
                     if (!openList.Contains(neighbor)) {
                         openList.Add(neighbor);
+                        stepIndices.Add(neighbor);
                     }
 
                 }
             }
+            stepNeighbors.Add(counter, stepIndices);
+            counter++;
 
         }
         return closedList;

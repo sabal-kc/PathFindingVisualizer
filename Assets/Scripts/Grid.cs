@@ -18,7 +18,14 @@ public class Grid : MonoBehaviour
 
 
     public List<Node> finalPath;
+    public List<Node> tempPath = new List<Node>();
     public HashSet<Node> visitedNodes;
+
+
+    public HashSet<Node> stepWiseNeigbors = new HashSet<Node>();
+    public HashSet<Node> stepWiseClosed = new HashSet<Node>();
+    
+    public Node stepWiseVisited;
 
 
     public enum Direction { FOUR, EIGHT };
@@ -33,6 +40,45 @@ public class Grid : MonoBehaviour
 
     }
 
+    public void AnimateFinalPath() {
+        StartCoroutine(ColorNode());
+    }
+
+    IEnumerator ColorNode() {
+        foreach (Node current in finalPath) {
+
+            foreach (Node n in grid) {
+                var cube = n.cube.transform;
+                var cubeRenderer = cube.GetComponent<MeshRenderer>();
+
+                if (n == current) {
+                    tempPath.Add(current);
+                    
+                }
+            }
+            yield return new WaitForSeconds(0.2f);
+
+        }
+     
+    }
+
+
+    public void colorFinalPath() {
+        foreach (Node n in grid) {
+            var cube = n.cube.transform;
+            var cubeRenderer = cube.GetComponent<MeshRenderer>();
+            cubeRenderer.material.SetColor("_Color", (n.isWalkable) ? Color.white : Color.red);
+
+            //Main coloring
+            if (finalPath != null && visitedNodes.Contains(n)) {
+                cubeRenderer.material.SetColor("_Color", Color.grey);
+            }
+            if (finalPath != null && finalPath.Contains(n)) {
+                cubeRenderer.material.SetColor("_Color", Color.yellow);
+            }
+        }
+    }
+
     private void Update() {
         if (grid != null) {
             Node playerNode = GetNodeFromWorldPoint(player.position);
@@ -41,16 +87,36 @@ public class Grid : MonoBehaviour
                 var cube = n.cube.transform;
                 var cubeRenderer = cube.GetComponent<MeshRenderer>();
                 cubeRenderer.material.SetColor("_Color", (n.isWalkable) ? Color.white : Color.red);
-
-                if (finalPath!=null && visitedNodes.Contains(n)) {
-                    cubeRenderer.material.SetColor("_Color", Color.grey);
-                }
-                if (finalPath!= null && finalPath.Contains(n)) {
-                    cubeRenderer.material.SetColor("_Color", Color.yellow);
-                }
                 if (playerNode == n || targetNode == n) {
                     cubeRenderer.material.SetColor("_Color", Color.cyan);
                 }
+
+                //Stepwise coloring
+
+                //Neighbors expanded
+                if (stepWiseNeigbors.Contains(n)) {
+                    cubeRenderer.material.SetColor("_Color", Color.grey);
+                }
+
+                //Closed nodes
+                if (stepWiseClosed.Contains(n)) {
+                    cubeRenderer.material.SetColor("_Color", Color.black);
+                }
+
+                //Current visited
+                if (n == stepWiseVisited) {
+                    cubeRenderer.material.SetColor("_Color", Color.green);
+
+                }
+
+
+
+                //Animation of path
+                if (tempPath.Contains(n)) {
+                    cubeRenderer.material.SetColor("_Color", Color.yellow);
+                }
+
+
                 //if (GetComponent<StepManager>().closedList.Contains(n)) {
                 //    cubeRenderer.material.SetColor("_Color", Color.yellow);
                 //}
@@ -105,8 +171,8 @@ public class Grid : MonoBehaviour
 
                 //}
 
-                for (int i=-1; i<=1; i++) {
-                    for (int j=-1; j<=1; j++) {
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
                         if (Mathf.Abs(i) == Mathf.Abs(j)) continue;
 
 
@@ -154,24 +220,6 @@ public class Grid : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos() {
-        //Gizmos.DrawWireCube(transform.position, new Vector3(totalGridSize.x, 1, totalGridSize.y));
-        //if (grid != null) {
-        //    Node playerNode = GetNodeFromWorldPoint(player.position);
-        //    Node targetNode = GetNodeFromWorldPoint(target.position);
-        //    foreach (Node n in grid) {
-        //        Gizmos.color = (n.isWalkable) ? Color.white : Color.red;
-        //        if (playerNode == n || targetNode == n) {
-        //            Gizmos.color = Color.cyan;
-        //        }
-        //        if (finalPath.Contains(n)) {
-        //            Gizmos.color = Color.yellow;
-        //        }
-
-        //        Gizmos.DrawCube(n.position, Vector3.one * (nodeRadius * 2 - .1f));
-        //    }
-        //}
-    }
 
 
 }

@@ -488,7 +488,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1539455508}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0120528685, y: 0.5925827, z: -7}
+  m_LocalPosition: {x: 0.0120528685, y: 0.5925827, z: 3.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -520,6 +520,7 @@ GameObject:
   - component: {fileID: 1822146777}
   - component: {fileID: 1822146781}
   - component: {fileID: 1822146783}
+  - component: {fileID: 1822146782}
   m_Layer: 0
   m_Name: MainGrid
   m_TagString: Untagged
@@ -613,13 +614,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eddecf5b4fd1a6246b45198160cc0315, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalGridSize: {x: 30, y: 30}
+  totalGridSize: {x: 27, y: 27}
   unwalkableMask:
     serializedVersion: 2
     m_Bits: 512
   player: {fileID: 1539455512}
   target: {fileID: 73446235}
   nodeRadius: 1
+--- !u!114 &1822146782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1822146776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65e6ce3a535cdb940a41f7bc4dd7c2b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1822146783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -635,3 +648,5 @@ MonoBehaviour:
   grid: {fileID: 0}
   startPosition: {fileID: 1539455512}
   endPosition: {fileID: 73446235}
+  stepWiseMode: 1
+  algo: 0

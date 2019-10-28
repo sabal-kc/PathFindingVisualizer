@@ -1,65 +1,50 @@
-﻿//using System.Collections;
-//using System.Collections.Generic;
-//using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-//public class StepManager : Singleton<StepManager>
-//{
-//    Node startNode, targetNode;
-//    Stack<Node> stack = new Stack<Node>();
-//    public HashSet<Node> closedList = new HashSet<Node>();
+public class StepManager : Singleton<StepManager>
+{
 
-//    // Start is called before the first frame update
-//    void Start() {
+    int step = 0;
+    Grid grid;
 
-//    }
+    // Start is called before the first frame update
+    void Start() {
+        grid = GetComponent<Grid>();
+    }
 
-//    // Update is called once per frame
-//    void Update() {
-//        if (Input.GetKeyDown(KeyCode.R)) {
-//            startNode = GetComponent<Grid>().GetNodeFromWorldPoint(GetComponent<DepthFirst>().startPosition.position);
-//            targetNode = GetComponent<Grid>().GetNodeFromWorldPoint(GetComponent<DepthFirst>().endPosition.position);
-
-//            // Mark the current node as visited and enqueue it 
-//            closedList.Add(startNode);
-//            stack.Push(startNode);
-//        }
-
-        
-//        if (Input.GetKeyDown(KeyCode.Space)) {
-//            if (stack.Count > 0) {
-//                step();
-//            }
-//        }
-
-//    }
+    // Update is called once per frame
+    void Update() {
 
 
-//    void step() {
-//        Debug.Log("Step");
-//        Node currentNode = stack.Pop();
-//        if (currentNode == targetNode) {
-//            //RetracePath(startNode, targetNode);
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            var neigbors = GetComponent<AlgorithmManager>().stepNeighbor;
+            var visited = GetComponent<AlgorithmManager>().stepVisited;
 
-//            //return closedList;
-//            return;
-//        }
-//        foreach (Node neighbor in GetComponent<Grid>().GetNeighboringNodes(currentNode, Grid.Direction.FOUR)) {
-//            Debug.Log(closedList.Count);
-//            if (!neighbor.isWalkable || closedList.Contains(neighbor))
-//                continue;
+            //Reset the animated path
+            if (grid.tempPath.Count > 0)
+                grid.tempPath = new List<Node>();
+
+            //Debug.Log(neigbors);
+            if (step < neigbors.Count) {
+                foreach (Node node in neigbors[step]){
+                    grid.stepWiseNeigbors.Add(node);
+                }
+                grid.stepWiseVisited = visited[step];
+                grid.stepWiseClosed.Add(visited[step]);
+                step += 1;
+            } else {
+                step = 0;
+                grid.stepWiseVisited = null;
+                grid.stepWiseNeigbors = new HashSet<Node>();
+                grid.stepWiseClosed = new HashSet<Node>();
+                grid.AnimateFinalPath();
+            }
+
+            
+        }
+
+    }
 
 
-
-//            neighbor.parent = currentNode;
-//            closedList.Add(neighbor);
-//            stack.Push(neighbor);
-
-
-
-//        }
-
-
-
-
-//    }
-//}
+}

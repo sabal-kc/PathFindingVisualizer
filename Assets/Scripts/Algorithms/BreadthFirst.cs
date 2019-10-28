@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BreadthFirst
+public class BreadthFirst: Algorithm
 {
-    Grid grid = AlgorithmManager.Instance.grid;
-
-    public HashSet<Node> FindShortestPath(Vector3 startPos, Vector3 endPos) {
+    public override HashSet<Node> FindShortestPath(Vector3 startPos, Vector3 endPos) {
         Node startNode = grid.GetNodeFromWorldPoint(startPos);
         Node targetNode = grid.GetNodeFromWorldPoint(endPos);
 
@@ -20,13 +18,20 @@ public class BreadthFirst
         queue.Enqueue(startNode);
 
 
+         int counter = 0;
+        stepVisited = new Dictionary<int, Node>();
+        stepNeighbors = new Dictionary<int, List<Node>>();
+
         while (queue.Count > 0) {
             Node currentNode = queue.Dequeue();
+            stepVisited.Add(counter, currentNode);
             if (currentNode == targetNode) {
                 AlgorithmManager.Instance.RetracePath(startNode, targetNode);
 
                 return visitedNodes;
             }
+
+            List<Node> stepIndices = new List<Node>();
             foreach (Node neighbor in grid.GetNeighboringNodes(currentNode, Grid.Direction.FOUR)) {
                 if (!neighbor.isWalkable || visitedNodes.Contains(neighbor))
                     continue;
@@ -36,10 +41,13 @@ public class BreadthFirst
                 neighbor.parent = currentNode;
                 visitedNodes.Add(neighbor);
                 queue.Enqueue(neighbor);
+                stepIndices.Add(neighbor);
 
 
 
             }
+            stepNeighbors.Add(counter, stepIndices);
+            counter++;
         }
 
         return visitedNodes;
