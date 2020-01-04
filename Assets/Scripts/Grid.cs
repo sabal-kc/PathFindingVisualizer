@@ -17,19 +17,21 @@ public class Grid : MonoBehaviour
 
 
 
-    public List<Node> finalPath;
-    public List<Node> tempPath = new List<Node>();
+    public List<Node> finalPath; //Final path taken
     public HashSet<Node> visitedNodes;
 
-
+    //Stepwise animation neigbors, closed and visited
+    public List<Node> tempPath = new List<Node>();
     public HashSet<Node> stepWiseNeigbors = new HashSet<Node>();
     public HashSet<Node> stepWiseClosed = new HashSet<Node>();
-    
     public Node stepWiseVisited;
 
 
     public enum Direction { FOUR, EIGHT };
-    const Direction DEFAULT_DIRECTION = Direction.EIGHT;
+    public Direction noOfDirections = Direction.FOUR;
+    public float nodeSeparationUnits = .2f;
+
+    List<GameObject> connectors = new List<GameObject>();
 
 
     void Start() {
@@ -40,6 +42,94 @@ public class Grid : MonoBehaviour
 
     }
 
+
+    private void Update() {
+        if (Input.GetMouseButtonDown(0)) {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out hit, 100.0f)) {
+                //suppose i have two objects here named obj1 and obj2.. how do i select obj1 to be transformed
+                if (hit.transform != null && hit.collider.name.Equals("Cube")) {
+                    Node current = GetNodeFromWorldPoint(hit.transform.position);
+                    current.isWalkable = !current.isWalkable;
+                }
+            }
+
+        }
+
+
+    }
+
+    void CreateGridNodes() {
+        grid = new Node[gridNodes.x, gridNodes.y];
+        Vector3 worldBottomLeft = transform.position - Vector3.right * totalGridSize.x / 2 - Vector3.forward * totalGridSize.y / 2;
+
+
+        for (int i = 0; i < gridNodes.x; i++) {
+            for (int j = 0; j < gridNodes.y; j++) {
+                Vector3 worldPoint = worldBottomLeft + Vector3.right * (i * nodeRadius * 2 + nodeRadius) + Vector3.forward * (j * nodeRadius * 2 + nodeRadius);
+                Vector3 cubeSize = Vector3.one * (nodeRadius * 2 - nodeSeparationUnits);
+                grid[i, j] = new Node(true, worldPoint, i, j, cubeSize);
+
+
+
+            }
+        }
+        CreateConnectors();
+
+
+
+
+    }
+
+    public void CreateConnectors() {
+        foreach(GameObject o in connectors) {
+            Destroy(o);
+        }
+        connectors.Clear();
+        foreach (Node n in grid) {
+            List<Node> neighbors = GetNeighboringNodes(n, noOfDirections);
+            foreach (Node nOther in neighbors) {
+                var connector = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                connector.transform.position = n.position + new Vector3(nOther.position.x / 2 - n.position.x / 2, 0, nOther.position.z / 2 - n.position.z / 2);
+                connector.transform.localScale = new Vector3(nodeSeparationUnits, 2.0f, nodeSeparationUnits);
+                connector.transform.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.black);
+                connectors.Add(connector);
+            }
+        }
+    }
+
+
+    //Color the grid in one pass //Must be called by the update of algorithm manager in non step mode
+    public void UpdateGridOnePass() {
+        Node playerNode = GetNodeFromWorldPoint(player.position);
+        Node targetNode = GetNodeFromWorldPoint(target.position);
+        foreach (Node n in grid) {
+            var cube = n.cube.transform;
+            var cubeRenderer = cube.GetComponent<MeshRenderer>();
+            cubeRenderer.material.SetColor("_Color", (n.isWalkable) ? Color.white : Color.red);
+            if (playerNode == n || targetNode == n) {
+                cubeRenderer.material.SetColor("_Color", Color.cyan);
+            }
+
+            //Main coloring
+            if (finalPath != null && visitedNodes.Contains(n)) {
+                cubeRenderer.material.SetColor("_Color", Color.grey);
+            }
+            if (finalPath != null && finalPath.Contains(n)) {
+                cubeRenderer.material.SetColor("_Color", Color.yellow);
+            }
+        }
+    }
+
+
+
+
+
+
+
+    //Called by the step manager during animation
     public void AnimateFinalPath() {
         StartCoroutine(ColorNode());
     }
@@ -53,33 +143,18 @@ public class Grid : MonoBehaviour
 
                 if (n == current) {
                     tempPath.Add(current);
-                    
+
                 }
             }
             yield return new WaitForSeconds(0.2f);
 
         }
-     
+
     }
 
-
-    public void colorFinalPath() {
-        foreach (Node n in grid) {
-            var cube = n.cube.transform;
-            var cubeRenderer = cube.GetComponent<MeshRenderer>();
-            cubeRenderer.material.SetColor("_Color", (n.isWalkable) ? Color.white : Color.red);
-
-            //Main coloring
-            if (finalPath != null && visitedNodes.Contains(n)) {
-                cubeRenderer.material.SetColor("_Color", Color.grey);
-            }
-            if (finalPath != null && finalPath.Contains(n)) {
-                cubeRenderer.material.SetColor("_Color", Color.yellow);
-            }
-        }
-    }
-
-    private void Update() {
+    //Called by algorithm manager in each update pass in stepwise mode
+    //Stepwise update of the color of the grid
+    public void UpdateGridStep() {
         if (grid != null) {
             Node playerNode = GetNodeFromWorldPoint(player.position);
             Node targetNode = GetNodeFromWorldPoint(target.position);
@@ -100,7 +175,7 @@ public class Grid : MonoBehaviour
 
                 //Closed nodes
                 if (stepWiseClosed.Contains(n)) {
-                    cubeRenderer.material.SetColor("_Color", Color.black);
+                    cubeRenderer.material.SetColor("_Color", new Color(0.2f, 0.2f, 0.2f));
                 }
 
                 //Current visited
@@ -125,20 +200,9 @@ public class Grid : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0)) {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out hit, 100.0f)) {
-                //suppose i have two objects here named obj1 and obj2.. how do i select obj1 to be transformed
-                if (hit.transform != null && hit.collider.name.Equals("Cube")) {
-                    Node current = GetNodeFromWorldPoint(hit.transform.position);
-                    current.isWalkable = !current.isWalkable;
-                }
-            }
-
-        }
     }
+
 
 
     public Node GetNodeFromWorldPoint(Vector3 worldPosition) {
@@ -154,7 +218,7 @@ public class Grid : MonoBehaviour
         return grid[x, y];
     }
 
-    public List<Node> GetNeighboringNodes(Node currentNode, Direction direction = DEFAULT_DIRECTION) {
+    public List<Node> GetNeighboringNodes(Node currentNode, Direction direction) {
         List<Node> neighbors = new List<Node>();
 
 
@@ -206,19 +270,7 @@ public class Grid : MonoBehaviour
     }
 
 
-    void CreateGridNodes() {
-        grid = new Node[gridNodes.x, gridNodes.y];
-        Vector3 worldBottomLeft = transform.position - Vector3.right * totalGridSize.x / 2 - Vector3.forward * totalGridSize.y / 2;
 
-
-        for (int i = 0; i < gridNodes.x; i++) {
-            for (int j = 0; j < gridNodes.y; j++) {
-                Vector3 worldPoint = worldBottomLeft + Vector3.right * (i * nodeRadius * 2 + nodeRadius) + Vector3.forward * (j * nodeRadius * 2 + nodeRadius);
-                Vector3 cubeSize = Vector3.one * (nodeRadius * 2 - .1f);
-                grid[i, j] = new Node(true, worldPoint, i, j, cubeSize);
-            }
-        }
-    }
 
 
 

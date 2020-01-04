@@ -32,7 +32,7 @@ public class BreadthFirst: Algorithm
             }
 
             List<Node> stepIndices = new List<Node>();
-            foreach (Node neighbor in grid.GetNeighboringNodes(currentNode, Grid.Direction.FOUR)) {
+            foreach (Node neighbor in grid.GetNeighboringNodes(currentNode, grid.noOfDirections)) {
                 if (!neighbor.isWalkable || visitedNodes.Contains(neighbor))
                     continue;
 

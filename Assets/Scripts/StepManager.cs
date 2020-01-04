@@ -18,32 +18,39 @@ public class StepManager : Singleton<StepManager>
 
 
         if (Input.GetKeyDown(KeyCode.Space)) {
-            var neigbors = GetComponent<AlgorithmManager>().stepNeighbor;
-            var visited = GetComponent<AlgorithmManager>().stepVisited;
-
-            //Reset the animated path
-            if (grid.tempPath.Count > 0)
-                grid.tempPath = new List<Node>();
-
-            //Debug.Log(neigbors);
-            if (step < neigbors.Count) {
-                foreach (Node node in neigbors[step]){
-                    grid.stepWiseNeigbors.Add(node);
-                }
-                grid.stepWiseVisited = visited[step];
-                grid.stepWiseClosed.Add(visited[step]);
-                step += 1;
-            } else {
-                step = 0;
-                grid.stepWiseVisited = null;
-                grid.stepWiseNeigbors = new HashSet<Node>();
-                grid.stepWiseClosed = new HashSet<Node>();
-                grid.AnimateFinalPath();
-            }
-
-            
+            StepForward();
         }
 
+    }
+
+    public void StepForward() {
+        var neigbors = AlgorithmManager.Instance.currentAlgorithm.stepNeighbors;
+        var visited = AlgorithmManager.Instance.currentAlgorithm.stepVisited;
+
+        //Reset the animated path
+        if (grid.tempPath.Count > 0)
+            grid.tempPath = new List<Node>();
+
+        if (step == 0) {
+            grid.stepWiseVisited = null;
+            grid.stepWiseNeigbors = new HashSet<Node>();
+            grid.stepWiseClosed = new HashSet<Node>();
+
+        }
+
+        //Debug.Log(neigbors);
+        if (step < neigbors.Count) {
+            foreach (Node node in neigbors[step]) {
+                grid.stepWiseNeigbors.Add(node);
+            }
+            grid.stepWiseVisited = visited[step];
+            grid.stepWiseClosed.Add(visited[step]);
+            step += 1;
+        } else {
+            step = 0;
+            grid.AnimateFinalPath();
+
+        }
     }
 
 

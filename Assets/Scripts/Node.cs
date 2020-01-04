@@ -15,6 +15,7 @@ public class Node
 
     //3d cube for the node
     public GameObject cube;
+    public GameObject connector;
 
     //Constructor
     public Node(bool isWalkable, Vector3 position, int gridX, int gridY, Vector3 cubeSize) {
@@ -32,6 +33,7 @@ public class Node
         this.cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         this.cube.transform.position = this.position;
         this.cube.transform.localScale = cubeSize;
+
 
     }
 

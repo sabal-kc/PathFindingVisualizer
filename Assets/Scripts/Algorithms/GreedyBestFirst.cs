@@ -43,7 +43,7 @@ public class GreedyBestFirst: Algorithm
 
             List<Node> stepIndices = new List<Node>();
             //Step5:  foreach neighbour of the current node
-            foreach (Node neighbor in grid.GetNeighboringNodes(currentNode, Grid.Direction.FOUR)) {
+            foreach (Node neighbor in grid.GetNeighboringNodes(currentNode, grid.noOfDirections)) {
                 //if neighbour is not traversable or 
                 if (!neighbor.isWalkable || closedList.Contains(neighbor))
                     continue;
